@@ -7,25 +7,25 @@ trait CozipK[T[_[_], _]] {
 
   def cozipk2[F[_], G[_]]: T[In2[F, G, ?], ?] ~> In2[T[F, ?], T[G, ?], ?]
 
-  def cozipk[C[_] <: CoproductK[_]](implicit coZipper: CoZipperK[T, C]): T[C, ?] ~> coZipper.Out = coZipper.cozipk
+  def cozipk[C[_] <: CopK[_]](implicit coZipper: CoZipperK[T, C]): T[C, ?] ~> coZipper.Out = coZipper.cozipk
 
 }
 
 object CozipK {
 
   def apply[T[_[_], _]](implicit c: CozipK[T]): CozipK[T] = c
-  
+
 }
 
-trait CoZipperK[T[_[_], _], C[_] <: CoproductK[_]] {
-  type Out[_] <: CoproductK[_]
+trait CoZipperK[T[_[_], _], C[_] <: CopK[_]] {
+  type Out[_] <: CopK[_]
 
   def cozipk: T[C, ?] ~> Out
 }
 
 object CoZipperK {
 
-  type Aux[T[_[_], _], C[_] <: CoproductK[_], D[_] <: CoproductK[_]] = CoZipperK[T, C] { type Out[t] = D[t] }
+  type Aux[T[_[_], _], C[_] <: CopK[_], D[_] <: CopK[_]] = CoZipperK[T, C] { type Out[t] = D[t] }
 
   implicit def two[T[_[_], _], F[_], G[_]](
     implicit coz: CozipK[T]
@@ -65,7 +65,7 @@ object CoZipperK {
     }
   }
 
-  implicit def rec[T[_[_], _], L[_] <: CoproductK[_], R[_] <: CoproductK[_], LO[_] <: CoproductK[_], RO[_] <: CoproductK[_]](
+  implicit def rec[T[_[_], _], L[_] <: CopK[_], R[_] <: CopK[_], LO[_] <: CopK[_], RO[_] <: CopK[_]](
     implicit
       coz: CozipK[T]
     , functork: FunctorK[T]

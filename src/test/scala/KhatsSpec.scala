@@ -50,13 +50,28 @@ object Foo {
     }
   }
 
+  implicit val cozipk = new CozipK[Foo] {
+    def cozipk2[F[_], G[_]] = new (Foo[In2[F, G, ?], ?] ~> In2[Foo[F, ?], Foo[G, ?], ?]) {
+      def apply[A](foo: Foo[In2[F, G, ?], A]):  In2[Foo[F, ?], Foo[G, ?], A] = foo match {
+        case Foo0(f) => f match {
+          case In2l(l) => In2l(Foo0(l))
+          case In2r(r) => In2r(Foo0(r))
+        }
+      }
+    }
+  }
+
 }
 
 
 class KhatsSpec extends FlatSpec with Matchers {
 
   "KhatsSpec" should "do it" in {
-    
+    type C = Option :|: List :|: NilK
+    val C = CopKBuilder[C]
+
+    val i = CozipK[Foo].cozipk[C.Cop].apply(Foo.Foo0(In2r(List(5))))
+    println(i)
   }
 
 }
